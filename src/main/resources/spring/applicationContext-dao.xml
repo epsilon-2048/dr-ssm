@@ -24,7 +24,7 @@
             防御sql注入的filter:wall-->
         <property name="filters" value="stat,wall"/>
         <!-- 每隔5分钟将监控日志输出到日志文件中，单位是毫秒。 -->
-        <property name="timeBetweenLogStatsMillis" value="20000" />
+        <property name="timeBetweenLogStatsMillis" value="300000" />
 
         <!--开启慢sql监控 增加拦截器-->
         <property name="proxyFilters">
@@ -78,8 +78,8 @@
 
     <!--sqlsession通用模板，现在不常用-->
     <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
-        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
-        <constructor-arg name="executorType" value="BATCH"></constructor-arg>
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <constructor-arg name="executorType" value="BATCH"/>
     </bean>
 
     <!--事务管理-->

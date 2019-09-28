@@ -24,6 +24,8 @@
     <!--设置输出地：日志文件-->
     <appender name="fileInfoApp" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--过滤器-->
+<!--        ppender中的LevelFilter：级别过滤器，根据日志级别进行过滤。
+            如果日志级别等于配置级别，过滤器会根据onMath 和 onMismatch接收或拒绝日志-->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level><!-- 指定要对级别为ERROR日志信息过滤 -->
             <OnMismatch>ACCEPT</OnMismatch> <!-- 如果不匹配，则立即处理 -->
@@ -46,6 +48,9 @@
     </appender>
 
     <appender name="fileErrorApp" class="ch.qos.logback.core.rolling.RollingFileAppender">
+<!--        appender中的ThresholdFilter： 临界值过滤器，过滤掉低于指定临界值的日志。
+                    当日志级别等于或高于临界值时，过滤器返回NEUTRAL。
+                     跟LevelFilter的区别在于一个是区间，一个是单点。-->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
         </filter>
@@ -77,7 +82,7 @@
     </root>
 
     <!--单独打印druid监控日志，我不知道哪一步出错了，
-        appender写错了，未改
+        appender写错了，LevelFilter与ThresholdFilter的区别
     -->
     <!--logger 根据name来匹配指定类的日志输出-->
 
@@ -97,10 +102,10 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <!-- 路径 -->
             <!--
-                        <fileNamePattern>${user.dir}/app_log/druid/druid_error.log</fileNamePattern>
+                        <fileNamePattern>${user.dir}/app_log/druid/druid_errors.%i.log.zip</fileNamePattern>
             -->、
             <!--指定文件压缩选项  .zip .gc 后缀 都是压缩格式-->
-            <fileNamePattern>D:/program/IdeaProjects/dr-ssm/app_log/druid/druid_error.log</fileNamePattern>
+            <fileNamePattern>D:/program/IdeaProjects/dr-ssm/app_log/druid/druid_errors.%i.log.zip</fileNamePattern>
             <minIndex>1</minIndex>
             <maxIndex>10</maxIndex>
         </rollingPolicy>
@@ -111,7 +116,7 @@
     </appender>
 
     <appender name="druidInfo" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level><!-- 指定要对级别为ERROR日志信息过滤 -->
             <OnMismatch>ACCEPT</OnMismatch> <!-- 如果不匹配，则立即处理 -->
             <OnMatch>DENY</OnMatch> <!-- 如果匹配，则拒绝处理 -->
@@ -127,9 +132,9 @@
       <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
           <!-- 路径 -->
             <!--
-                        <fileNamePattern>${user.dir}/app_log/druid/druid_info.log</fileNamePattern>
+                        <fileNamePattern>${user.dir}/app_log/druid/druid_infos.%i.log.zip</fileNamePattern>
             -->
-            <fileNamePattern>D:/program/IdeaProjects/dr-ssm/app_log/druid/druid_info.log</fileNamePattern>
+            <fileNamePattern>D:/program/IdeaProjects/dr-ssm/app_log/druid/druid_infos.%i.log.zip</fileNamePattern>
           <minIndex>1</minIndex>
           <maxIndex>10</maxIndex>
         </rollingPolicy>
