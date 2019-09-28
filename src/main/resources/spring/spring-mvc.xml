@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd ">
+
+    <!--配置注解驱动-->
+    <mvc:annotation-driven />
+    <!-- 启动对@AspectJ注解的支持 -->
+    <aop:aspectj-autoproxy />
+
+    <aop:config proxy-target-class="true"></aop:config>
+    <!-- 扫描切点类组件 -->
+    <!--//放置切面实现类的包路径-->
+    <context:component-scan base-package="epsilon.ssm.aspect"/>
+
+
+    <!-- 扫描controller（controller层注入） -->
+    <context:component-scan base-package="epsilon.ssm.controller" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!-- 对模型视图添加前后缀 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+        <property name="prefix" value="/WEB-INF/views"></property>
+        <property name="suffix" value=".html"></property>
+    </bean>
+    <!-- 当在web.xml 中   DispatcherServlet使用 <url-pattern>/</url-pattern> 映射时，能映射静态资源 -->
+    <mvc:default-servlet-handler />
+    <!-- 静态资源映射  对静态资源放行-->
+    <mvc:resources mapping="/static/**" location="/static/"/>
+
+    <!-- 引入swagger相关 -->
+    <bean class="epsilon.ssm.config.SwaggerConfiguration"></bean>
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/" />
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/" />
+    <bean class="springfox.documentation.swagger2.configuration.Swagger2DocumentationConfiguration" id="swagger2Config"/>
+    <!-- redis配置 -->
+    <!--<import resource="applicationContext-redis.xml"/>-->
+</beans>

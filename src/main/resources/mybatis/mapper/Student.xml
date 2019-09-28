@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper    
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="test">
+<!-- resultType=""  返回值-->
+   <select id="selectAll" resultType="epsilon.ssm.bean.Student">
+       SELECT * FROM student
+   </select>
+<!-- parameterType="int" 入参   并且传入的是一个简单类型的时候，#{} 相当于一个？ {}变量名称可以随便填-->
+   <select id="selectById" resultType="epsilon.ssm.bean.Student" parameterType="int">
+       SELECT * FROM student where id=#{id}
+   </select>
+</mapper>
+
+
+

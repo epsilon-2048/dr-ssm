@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd
+          http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+    <!--配置注解驱动-->
+    <mvc:annotation-driven />
+    <!--这是扫描我的组件-->
+    <context:component-scan base-package="epsilon.ssm.util"/>
+
+    <!--集群配置结点-->
+    <bean id="redisClusterConfiguration" class="org.springframework.data.redis.connection.RedisClusterConfiguration">
+        <property name="password" >
+            <bean id="redisPassword" class="org.springframework.data.redis.connection.RedisPassword">
+                <constructor-arg index="0" value="chen"/>
+            </bean>
+        </property>
+        <property name="maxRedirects" value="3"/>
+        <property name="clusterNodes">
+            <set>
+                <bean id="node1" class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="10.86.2.17"/>
+                    <constructor-arg name="port" value="7001"/>
+                </bean>
+                <bean id="node2" class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="10.86.2.17"/>
+                    <constructor-arg name="port" value="7002"/>
+                </bean>
+                <bean id="node3" class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="10.86.2.17"/>
+                    <constructor-arg name="port" value="7003"/>
+                </bean>
+                <bean id="node4" class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="10.86.2.17"/>
+                    <constructor-arg name="port" value="7004"/>
+                </bean>
+                <bean id="node5" class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="10.86.2.17"/>
+                    <constructor-arg name="port" value="7005"/>
+                </bean>
+                <bean id="node6" class="org.springframework.data.redis.connection.RedisNode">
+                    <constructor-arg name="host" value="10.86.2.17"/>
+                    <constructor-arg name="port" value="7006"/>
+                </bean>
+            </set>
+        </property>
+    </bean>
+    <!--连接池-->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!--最大连接数-->
+        <property name="maxTotal" value="300"/>
+        <!--最大空闲数-->
+        <property name="maxIdle" value="30"/>
+        <!--最小空闲数-->
+        <property name="minIdle" value="5"/>
+        <property name="blockWhenExhausted" value="false"/>
+        <property name="numTestsPerEvictionRun" value="1024"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="softMinEvictableIdleTimeMillis" value="10000"/>
+        <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+        <property name="maxWaitMillis" value="15000"/>
+        <property name="testWhileIdle" value="true"/>
+    </bean>
+    <!--连接工厂-->
+    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <constructor-arg index="0" ref="redisClusterConfiguration"/>
+        <constructor-arg index="1" ref="poolConfig"/>
+    </bean>
+    <!--模板-->
+    <!--序列化为字符串-->
+    <bean id="stringRedisSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+    <!--序列化为字节码-->
+    <bean id="jdkSerializationRedisSerializer" class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+   <!--序列化为json-->
+    <bean id="genericJackson2JsonRedisSerializer" class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory"/>
+        <property name="keySerializer" ref="stringRedisSerializer"/>
+        <property name="valueSerializer" ref="genericJackson2JsonRedisSerializer"/>
+        <property name="hashKeySerializer" ref="genericJackson2JsonRedisSerializer"/>
+        <property name="hashValueSerializer" ref="jdkSerializationRedisSerializer"/>
+    </bean>
+    <bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory"/>
+        <property name="keySerializer" ref="stringRedisSerializer"/>
+        <property name="valueSerializer" ref="jdkSerializationRedisSerializer"/>
+    </bean>
+</beans>

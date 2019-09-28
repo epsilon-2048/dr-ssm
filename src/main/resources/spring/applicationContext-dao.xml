@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!-- 配置 读取properties文件 *.properties -->
+    <context:property-placeholder location="classpath:*.properties" />
+
+    <!-- 配置 数据源 -->
+
+    <context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.driverUrl}" />
+        <property name="username" value="${jdbc.who}" />
+        <property name="password" value="${jdbc.pd}" />
+        <property name="maxActive" value="10" />
+        <property name="minIdle" value="5" />
+
+
+        <!--    druid监控 stat开启stat监控，wall开启sql防火墙监控
+        监控统计用的filter:stat
+            防御sql注入的filter:wall-->
+        <property name="filters" value="stat,wall"/>
+        <!-- 每隔5分钟将监控日志输出到日志文件中，单位是毫秒。 -->
+        <property name="timeBetweenLogStatsMillis" value="20000" />
+
+        <!--开启慢sql监控 增加拦截器-->
+        <property name="proxyFilters">
+            <list>
+                <ref bean="stat-filter"/>
+                <ref bean="log-filter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 慢SQL记录 -->
+    <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+    <!-- 慢sql时间设置,即执行时间大于100毫秒的都是慢sql 默认300 -->
+         <property name="slowSqlMillis" value="100"/>
+         <property name="logSlowSql" value="true"/>
+    </bean>
+<!--日志输出-->
+    <bean id="log-filter" class="com.alibaba.druid.filter.logging.Log4jFilter">
+        <!--所有DataSource相关的日志-->
+        <property name="dataSourceLogEnabled" value="true" />
+        <!-- 所有连接相关的日志 -->
+        <property name="connectionLogEnabled" value="false"/>
+        <!-- 所有Statement相关的日志 -->
+        <property name="statementLogEnabled" value="false"/>
+        <!-- 是否显示结果集 -->
+        <property name="resultSetLogEnabled" value="true"/>
+        <!-- 是否显示SQL语句 -->
+        <property name="statementExecutableSqlLogEnable" value="true"/>
+    </bean>
+    <!--druid 分割线结束*****************************-->
+
+
+    <!-- 配置SqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 设置MyBatis核心配置文件 -->
+        <property name="configLocation" value="classpath:/mybatis/mybatis-config.xml" />
+        <!-- 设置数据源 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 它表示我们的Mapper文件存放的位置，当我们的Mapper文件跟对应的Mapper接口处于同一位置的时候可以不用指定该属性的值。 -->
+        <property name="mapperLocations" value="classpath:mybatis/mapper/*.xml" />
+        <!-- 那么在Mapper文件里面就可以直接写对应的类名 而不用写全路径名了  -->
+        <!-- 跟mybatis中<typeAliases>作用一样 -->
+        <!-- <property name="typeAliasesPackage" value="epsilon.ssm.bean"/> -->
+    </bean>
+
+    <!-- 配置Mapper扫描（dao层） -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 设置Mapper扫描包 -->
+        <property name="basePackage" value="epsilon.ssm.mapper" />
+    </bean>
+
+    <!--sqlsession通用模板，现在不常用-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+        <constructor-arg name="executorType" value="BATCH"></constructor-arg>
+    </bean>
+
+    <!--事务管理-->
+    <!--
+
+        <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="dataSource"/>
+        </bean>-->
+
+</beans>
