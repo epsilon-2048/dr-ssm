@@ -31,10 +31,14 @@
             <list>
                 <ref bean="stat-filter"/>
                 <ref bean="log-filter"/>
+                <!--<ref bean="wall-filter"/>-->
             </list>
         </property>
     </bean>
-
+    <!--防sql注入-->
+<!--    <bean id="wall-filter" class="com.alibaba.druid.wall.WallFilter">
+·&lt;!&ndash;相关配置https://github.com/alibaba/druid/wiki/%E9%85%8D%E7%BD%AE-wallfilter&ndash;&gt;
+    </bean>-->
     <!-- 慢SQL记录 -->
     <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
     <!-- 慢sql时间设置,即执行时间大于100毫秒的都是慢sql 默认300 -->
@@ -54,6 +58,49 @@
         <!-- 是否显示SQL语句 -->
         <property name="statementExecutableSqlLogEnable" value="true"/>
     </bean>
+
+   <!--spring关联监控-->
+    <bean id="druid-stat-interceptor"
+          class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+    </bean>
+    <!--按类型匹配拦截-->
+    <bean id="druid-type-proxyCreator" class="com.alibaba.druid.support.spring.stat.BeanTypeAutoProxyCreator">
+        <!-- 所有MedicineMapper的派生类被拦截监控  -->
+        <property name="targetBeanType" value="epsilon.ssm.mapper.MedicineMapper" />
+        <property name="interceptorNames">
+            <list>
+                <value>druid-stat-interceptor</value>
+            </list>
+        </property>
+    </bean>
+    <!--按beanId来匹配拦截-->
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="proxyTargetClass" value="true" />
+        <property name="beanNames">
+            <list>
+                <!-- 这里配置需要拦截的bean id列表 -->
+                <value>CategoryMapper</value>
+            </list>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>druid-stat-interceptor</value>
+            </list>
+        </property>
+    </bean>
+    <!--正则表达式匹配切入点-->
+    <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+          scope="prototype">
+        <property name="patterns">
+            <list>
+                <value>epsilon.ssm.service.*</value>
+            </list>
+        </property>
+    </bean>
+
+    <aop:config>
+        <aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut"/><!--爆红不管-->
+    </aop:config>
     <!--druid 分割线结束*****************************-->
 
 
