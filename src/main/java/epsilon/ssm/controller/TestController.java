@@ -1,6 +1,7 @@
 package epsilon.ssm.controller;
 
 import epsilon.ssm.annotation.MyAnnotation;
+import epsilon.ssm.exceptionHandler.myException.UnauthorizedException;
 import epsilon.ssm.service.TestService;
 import epsilon.ssm.util.JsonUtil;
 import epsilon.ssm.util.LogUtil;
@@ -52,6 +53,10 @@ public class TestController {
         }*/
         return ResultUtil.buildSuccess().append("data",testService.select(pn));
     }
-
+    @RequestMapping(value = "ext")
+    @ResponseBody
+    public ResultUtil test2(){
+        throw new UnauthorizedException();
+    }
 
 }
