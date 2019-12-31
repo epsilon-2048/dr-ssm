@@ -8,9 +8,14 @@
     <!-- 起別名后，不用在mapper resultType 填写全类名 -->
     <!--	<typeAliases>
         </typeAliases>-->
+
+  <!--  <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+    </settings>-->
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageInterceptor">
             <property name="reasonable" value="true"/>
         </plugin>
     </plugins>
+
 </configuration>
